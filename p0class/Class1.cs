@@ -15,7 +15,7 @@ namespace p0class
 
         public void addOrder(string p_order) 
         { 
-            Orders.Add(p_order)
+            Orders.Add(p_order);
         }
 
     }
