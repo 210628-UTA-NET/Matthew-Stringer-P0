@@ -13,7 +13,10 @@ namespace p0class
 
         public List<string> Orders {get;}
 
-        public void addOrder(string p_order) { }
+        public void addOrder(string p_order) 
+        { 
+            Orders.Add(p_order)
+        }
 
     }
 }
