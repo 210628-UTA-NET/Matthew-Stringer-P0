@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace p0class
 {
@@ -11,12 +10,6 @@ namespace p0class
 
         public string Email {set; get;}
 
-        public List<string> Orders {get;}
-
-        public void addOrder(string p_order) 
-        { 
-            Orders.Add(p_order);
-        }
-
+        public List<string> Orders = new List<string>();
     }
 }

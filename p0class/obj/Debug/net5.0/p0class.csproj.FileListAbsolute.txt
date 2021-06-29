@@ -1,0 +1,12 @@
+D:\File Place\P0\p0class\bin\Debug\net5.0\p0class.deps.json
+D:\File Place\P0\p0class\bin\Debug\net5.0\p0class.dll
+D:\File Place\P0\p0class\bin\Debug\net5.0\ref\p0class.dll
+D:\File Place\P0\p0class\bin\Debug\net5.0\p0class.pdb
+D:\File Place\P0\p0class\obj\Debug\net5.0\p0class.csproj.AssemblyReference.cache
+D:\File Place\P0\p0class\obj\Debug\net5.0\p0class.GeneratedMSBuildEditorConfig.editorconfig
+D:\File Place\P0\p0class\obj\Debug\net5.0\p0class.AssemblyInfoInputs.cache
+D:\File Place\P0\p0class\obj\Debug\net5.0\p0class.AssemblyInfo.cs
+D:\File Place\P0\p0class\obj\Debug\net5.0\p0class.csproj.CoreCompileInputs.cache
+D:\File Place\P0\p0class\obj\Debug\net5.0\p0class.dll
+D:\File Place\P0\p0class\obj\Debug\net5.0\ref\p0class.dll
+D:\File Place\P0\p0class\obj\Debug\net5.0\p0class.pdb
