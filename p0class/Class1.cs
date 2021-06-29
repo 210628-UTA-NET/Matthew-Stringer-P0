@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic
+using System.Collections.Generic;
 
 namespace p0class
 {
@@ -13,7 +13,7 @@ namespace p0class
 
         public List<string> Orders {get;}
 
-        public void addOrder(string);
+        public void addOrder(string p_order) { }
 
     }
 }
