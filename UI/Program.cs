@@ -1,6 +1,7 @@
 ﻿using System;
 using p0class;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace UI
 {
@@ -42,6 +43,8 @@ namespace UI
                     Console.WriteLine(item);
                 }
             }
+            string jsonString = JsonSerializer.Serialize(customerList);
+            Console.WriteLine(jsonString);
         }
     }
 }
