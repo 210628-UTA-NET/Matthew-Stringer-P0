@@ -10,6 +10,11 @@ namespace p0class
 
         public string Email {set; get;}
 
-        public List<string> Orders = new List<string>();
+        public List<string> Orders {get;}
+
+        public Customer()
+        {
+            Orders = new List<string>();
+        }
     }
 }
