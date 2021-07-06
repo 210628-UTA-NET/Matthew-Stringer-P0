@@ -5,15 +5,15 @@ using System.Text.Json;
 
 namespace p0class
 {
-    public class JsonDatastore : Datastore
+    public class JsonDatastore<T> : Datastore<T> where T : class
     {
         private string _filename = "./datafiles/datastore.json";
-        private List<Customer> _customers;
+        private List<T> _records;
 
-        public bool AddCustomer(Customer p_cust)
+        public bool AddRecord(T p_rec)
         {
-            _customers.Add(p_cust);
-            string jsonString = JsonSerializer.Serialize<List<Customer>>(_customers);
+            _records.Add(p_rec);
+            string jsonString = JsonSerializer.Serialize<List<T>>(_records);
             try
             {
                 File.WriteAllText(_filename, jsonString);
@@ -25,12 +25,12 @@ namespace p0class
             return true;
         }
 
-        public List<Customer> LoadAllCustomer()
+        public List<T> LoadAllRecords()
         {
-            return new List<Customer>(_customers);
+            return new List<T>(_records);
         }
 
-        public Customer LoadCustomer(Customer _pcust)
+        public T LoadRecord(T _p_rec)
         {
             throw new System.NotImplementedException();
         }
@@ -47,7 +47,7 @@ namespace p0class
                 throw new Exception("File path is invalid");
             }
 
-            _customers = JsonSerializer.Deserialize<List<Customer>>(jsonString);
+            _records = JsonSerializer.Deserialize<List<T>>(jsonString);
         }
     }
 }

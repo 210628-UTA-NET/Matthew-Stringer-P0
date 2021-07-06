@@ -9,8 +9,8 @@ namespace P0UI
         static void Main(string[] args)
         {
             bool customerRepeat = true;
-            JsonDatastore jsonDatastore = new JsonDatastore();
-            List<Customer> customerList = jsonDatastore.LoadAllCustomer();
+            JsonDatastore<Customer> jsonDatastore = new JsonDatastore<Customer>();
+            List<Customer> customerList = jsonDatastore.LoadAllRecords();
             while (customerRepeat) {
                 Customer customer = new Customer();
                 Console.WriteLine("Name?");
@@ -29,8 +29,8 @@ namespace P0UI
                         customer.Orders.Add(order);
                     }
                 }
-                jsonDatastore.AddCustomer(customer);
-                customerList = jsonDatastore.LoadAllCustomer();
+                jsonDatastore.AddRecord(customer);
+                customerList = jsonDatastore.LoadAllRecords();
                 Console.WriteLine("Continue? (y/n)");
                 customerRepeat = Console.ReadLine() == "y";
             }
