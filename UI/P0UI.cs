@@ -1,8 +1,6 @@
 ﻿using System;
 using p0class;
 using System.Collections.Generic;
-using System.Text.Json;
-using System.IO;
 
 namespace P0UI
 {
@@ -10,11 +8,9 @@ namespace P0UI
     {
         static void Main(string[] args)
         {
-            string filename = "./datafiles/datastore.json";
-            string jsonString = File.ReadAllText(filename);
-            List<Customer> customerList = JsonSerializer.Deserialize<List<Customer>>(jsonString);
-
             bool customerRepeat = true;
+            JsonDatastore jsonDatastore = new JsonDatastore();
+            List<Customer> customerList = jsonDatastore.LoadAllCustomer();
             while (customerRepeat) {
                 Customer customer = new Customer();
                 Console.WriteLine("Name?");
@@ -33,7 +29,8 @@ namespace P0UI
                         customer.Orders.Add(order);
                     }
                 }
-                customerList.Add(customer);
+                jsonDatastore.AddCustomer(customer);
+                customerList = jsonDatastore.LoadAllCustomer();
                 Console.WriteLine("Continue? (y/n)");
                 customerRepeat = Console.ReadLine() == "y";
             }
@@ -46,9 +43,6 @@ namespace P0UI
                     Console.WriteLine(item);
                 }
             }
-            jsonString = JsonSerializer.Serialize<List<Customer>>(customerList);
-            Console.WriteLine(jsonString);
-            File.WriteAllText(filename, jsonString);
         }
     }
 }
