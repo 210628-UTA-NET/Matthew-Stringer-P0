@@ -10,10 +10,46 @@ namespace P0UI
 {
     class Program
     {
+        static void MainMenu(SQLDatastore datastore)
+        {
+            bool looping = true;
+
+            while (looping)
+            {
+                Console.WriteLine("Select:");
+                Console.WriteLine("0: Exit");
+                Console.WriteLine("1. Add Customer");
+                Console.WriteLine("2. Search Customer");
+                switch(Console.ReadLine())
+                {
+                    case "0":
+                        looping = false;
+                        break;
+                    case "1":
+                        p0class.Customer customer = new p0class.Customer();
+                        Console.WriteLine("Name?");
+                        customer.Name = Console.ReadLine();
+                        Console.WriteLine("Address?");
+                        customer.Address = Console.ReadLine();
+                        Console.WriteLine("Email?");
+                        customer.Email = Console.ReadLine();
+                        datastore.AddCustomer(customer);
+                        break;
+                    case "2":
+                        Console.WriteLine("Enter Customer Name:");
+                        foreach (p0class.Customer cust in datastore.SearchCustomerByName(Console.ReadLine()))
+                        {
+                            Console.WriteLine($"{cust.Name}, {cust.Address}, {cust.Email}");
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("Invalid Entry, try again.");
+                        break;
+                }
+            }
+        }
         static void Main(string[] args)
         {
-            bool customerRepeat = true;
-
             //Get the configuration from our appsetting.json file
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -28,18 +64,7 @@ namespace P0UI
                 .Options;
 
             SQLDatastore repo = new SQLDatastore(new MattStringer0Context(options));
-            while (customerRepeat) {
-                p0class.Customer customer = new p0class.Customer();
-                Console.WriteLine("Name?");
-                customer.Name = Console.ReadLine();
-                Console.WriteLine("Address?");
-                customer.Address = Console.ReadLine();
-                Console.WriteLine("Email?");
-                customer.Email = Console.ReadLine();
-                repo.AddCustomer(customer);
-                Console.WriteLine("Continue? (y/n)");
-                customerRepeat = Console.ReadLine() == "y";
-            }
+            MainMenu(repo);
         }
     }
 }
