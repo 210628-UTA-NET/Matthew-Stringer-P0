@@ -16,7 +16,9 @@ namespace p0class.Entities
         public string OLoc { get; set; }
         public decimal OPrice { get; set; }
         public int OStore { get; set; }
+        public int? Customer { get; set; }
 
+        public virtual Customer CustomerNavigation { get; set; }
         public virtual StoreFront OStoreNavigation { get; set; }
         public virtual ICollection<LineItem> LineItems { get; set; }
     }

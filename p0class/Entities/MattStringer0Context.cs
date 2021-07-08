@@ -17,6 +17,7 @@ namespace p0class.Entities
         {
         }
 
+        public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<LineItem> LineItems { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<Product> Products { get; set; }
@@ -25,6 +26,31 @@ namespace p0class.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<Customer>(entity =>
+            {
+                entity.HasKey(e => e.CId)
+                    .HasName("pk_customer");
+
+                entity.ToTable("customer");
+
+                entity.Property(e => e.CId).HasColumnName("c_id");
+
+                entity.Property(e => e.CAddr)
+                    .HasMaxLength(90)
+                    .IsUnicode(false)
+                    .HasColumnName("c_addr");
+
+                entity.Property(e => e.CEmail)
+                    .HasMaxLength(60)
+                    .IsUnicode(false)
+                    .HasColumnName("c_email");
+
+                entity.Property(e => e.CName)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("c_name");
+            });
 
             modelBuilder.Entity<LineItem>(entity =>
             {
@@ -69,6 +95,8 @@ namespace p0class.Entities
 
                 entity.Property(e => e.OId).HasColumnName("o_id");
 
+                entity.Property(e => e.Customer).HasColumnName("customer");
+
                 entity.Property(e => e.OLoc)
                     .IsRequired()
                     .HasMaxLength(30)
@@ -80,6 +108,11 @@ namespace p0class.Entities
                     .HasColumnName("o_price");
 
                 entity.Property(e => e.OStore).HasColumnName("o_store");
+
+                entity.HasOne(d => d.CustomerNavigation)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.Customer)
+                    .HasConstraintName("fk_orders_customer");
 
                 entity.HasOne(d => d.OStoreNavigation)
                     .WithMany(p => p.Orders)
