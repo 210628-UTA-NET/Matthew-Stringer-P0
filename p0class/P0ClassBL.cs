@@ -10,11 +10,11 @@ namespace p0class
 
         public string Email {set; get;}
 
-        public List<LineItem> Orders {set; get;}
+        public List<Order> Orders {set; get;}
 
         public Customer()
         {
-            this.Orders = new List<LineItem>();
+            this.Orders = new List<Order>();
         }
     }
 
