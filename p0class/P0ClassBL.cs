@@ -38,6 +38,7 @@ namespace p0class
 
     public class StoreFront
     {
+        public int id {set; get;}
         public string Name {set; get;}
 
         public string Address {set; get;}
