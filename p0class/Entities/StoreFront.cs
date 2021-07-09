@@ -15,6 +15,7 @@ namespace p0class.Entities
 
         public int SId { get; set; }
         public string SAddr { get; set; }
+        public string SName { get; set; }
 
         public virtual ICollection<LineItem> LineItems { get; set; }
         public virtual ICollection<Order> Orders { get; set; }

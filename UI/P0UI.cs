@@ -10,7 +10,47 @@ namespace P0UI
 {
     class Program
     {
-        static void MainMenu(SQLDatastore datastore)
+        public enum MenuState
+        {
+            MainMenu,
+            StoreFrontMenu,
+            ViewInventory,
+            PlaceOrder,
+            OrderHistory,
+            Replenish,
+            Exit
+
+        }
+
+        static List<int> SearchCustomer(SQLDatastore datastore)
+        {
+            Console.WriteLine("Enter Customer Name:");
+
+            List<int> result = new List<int>();
+
+            foreach (SQLDatastore.CustomerSearchResult cust in datastore.SearchCustomerByName(Console.ReadLine()))
+            {
+                Console.WriteLine($"{cust.Name}, {cust.Address}, {cust.Email}");
+                result.Add(cust.Id);
+            }
+            return result;
+        }
+
+        static List<int> SearchStoreFront(SQLDatastore datastore)
+        {
+            Console.WriteLine("Enter Store Name:");
+
+            List<int> result = new List<int>();
+
+            foreach (SQLDatastore.StoreSearchResult store in datastore.SearchStoreFrontByName(Console.ReadLine()))
+            {
+                Console.WriteLine($"{store.Name}, {store.Address}");
+                result.Add(store.Id);
+            }
+            return result;
+        }
+
+        static MenuState MainMenu(SQLDatastore datastore)
         {
             bool looping = true;
 
@@ -20,6 +60,7 @@ namespace P0UI
                 Console.WriteLine("0: Exit");
                 Console.WriteLine("1. Add Customer");
                 Console.WriteLine("2. Search Customer");
+                Console.WriteLine("3. Search Store Fronts");
                 switch(Console.ReadLine())
                 {
                     case "0":
@@ -36,18 +77,38 @@ namespace P0UI
                         datastore.AddCustomer(customer);
                         break;
                     case "2":
-                        Console.WriteLine("Enter Customer Name:");
-                        foreach (p0class.Customer cust in datastore.SearchCustomerByName(Console.ReadLine()))
-                        {
-                            Console.WriteLine($"{cust.Name}, {cust.Address}, {cust.Email}");
-                        }
+                        SearchCustomer(datastore);
+                        break;
+                    case "3":
+                        SearchStoreFront(datastore);
                         break;
                     default:
                         Console.WriteLine("Invalid Entry, try again.");
                         break;
                 }
             }
+            return MenuState.Exit;
         }
+
+        static void MenuStateMachine(SQLDatastore datastore)
+        {
+            MenuState state = MenuState.MainMenu;
+
+            while (state != MenuState.Exit)
+            {
+                switch(state)
+                {
+                    case MenuState.MainMenu:
+                        state = MainMenu(datastore);
+                        break;
+                    case MenuState.Exit:
+                        return;
+                    default:
+                        throw new InvalidProgramException("Invalid Menu State");
+                }
+            }
+        }
+
         static void Main(string[] args)
         {
             //Get the configuration from our appsetting.json file
@@ -64,7 +125,7 @@ namespace P0UI
                 .Options;
 
             SQLDatastore repo = new SQLDatastore(new MattStringer0Context(options));
-            MainMenu(repo);
+            MenuStateMachine(repo);
         }
     }
 }
