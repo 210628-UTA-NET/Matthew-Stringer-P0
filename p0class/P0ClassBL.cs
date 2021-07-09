@@ -65,6 +65,10 @@ namespace p0class
 
         public decimal TotalPrice {set; get;}
 
+        public int CustomerId {set; get;}
+
+        public int StoreFrontId {set; get;}
+
         public Order()
         {
             this.LineItems = new List<LineItem>();
