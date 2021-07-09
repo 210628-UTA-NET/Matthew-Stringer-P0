@@ -95,7 +95,7 @@ namespace p0class.Entities
 
                 entity.Property(e => e.OId).HasColumnName("o_id");
 
-                entity.Property(e => e.Customer).HasColumnName("customer");
+                entity.Property(e => e.OCust).HasColumnName("o_cust");
 
                 entity.Property(e => e.OLoc)
                     .IsRequired()
@@ -109,9 +109,9 @@ namespace p0class.Entities
 
                 entity.Property(e => e.OStore).HasColumnName("o_store");
 
-                entity.HasOne(d => d.CustomerNavigation)
+                entity.HasOne(d => d.OCustNavigation)
                     .WithMany(p => p.Orders)
-                    .HasForeignKey(d => d.Customer)
+                    .HasForeignKey(d => d.OCust)
                     .HasConstraintName("fk_orders_customer");
 
                 entity.HasOne(d => d.OStoreNavigation)
@@ -164,6 +164,11 @@ namespace p0class.Entities
                     .HasMaxLength(90)
                     .IsUnicode(false)
                     .HasColumnName("s_addr");
+
+                entity.Property(e => e.SName)
+                    .HasMaxLength(60)
+                    .IsUnicode(false)
+                    .HasColumnName("s_name");
             });
 
             OnModelCreatingPartial(modelBuilder);
