@@ -96,5 +96,73 @@ namespace p0class
             }
             return resultList;
         }
+
+        private List<LineItem> LoadLineItemsById(int p_id, bool p_order)
+        {
+            var data = _context.LineItems.Join(
+                _context.Products,
+                item => item.LProd,
+                prod => prod.PId,
+                (item, prod) => new
+                {
+                    Quantity = item.LQuantity,
+                    Order = item.LOrder,
+                    StoreFront = item.LStorefront,
+                    PId = prod.PId,
+                    Name = prod.PName,
+                    Price = prod.PPrice,
+                    Desc = prod.PDesc,
+                    Category = prod.PCategory
+                }
+            ).Where(x => (p_order ? x.Order : x.StoreFront) == p_id).ToList();
+
+            List<LineItem> result = new List<LineItem>();
+            foreach (var datum in data)
+            {
+                LineItem newLine = new LineItem {
+                    Quantity = datum.Quantity,
+                    Prod = new Product{
+                        Id = datum.PId,
+                        Name = datum.Name,
+                        Price = datum.Price,
+                        Description = datum.Desc,
+                        Category = datum.Category
+                    }
+                };
+                result.Add(newLine);
+            }
+            return result;
+        }
+
+        public StoreFront LoadStoreFrontById(int p_id)
+        {
+            StoreFront result = _context.StoreFronts.Select(
+                store =>
+                    new StoreFront
+                    {
+                        Id = store.SId,
+                        Name = store.SName,
+                        Address = store.SAddr
+                    }
+            ).Where(x => x.Id == p_id).First<StoreFront>();
+
+            result.Orders = _context.Orders.Select(
+                order =>
+                    new Order
+                    {
+                        Id = order.OId,
+                        Location = order.OLoc,
+                        StoreFrontId = order.OStore
+                    }
+            ).Where(x => x.StoreFrontId == result.Id).ToList();
+
+            foreach(Order order in result.Orders)
+            {
+                order.LineItems = LoadLineItemsById(order.Id, true);
+            }
+
+            result.Inventory = LoadLineItemsById(result.Id, false);
+            return result;
+        }
     }
 }

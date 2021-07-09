@@ -41,13 +41,45 @@ namespace P0UI
             Console.WriteLine("Enter Store Name:");
 
             List<int> result = new List<int>();
-
+            int i = 1;
             foreach (SQLDatastore.StoreSearchResult store in datastore.SearchStoreFrontByName(Console.ReadLine()))
             {
-                Console.WriteLine($"{store.Name}, {store.Address}");
+                Console.WriteLine($"{i}: {store.Name}, {store.Address}");
                 result.Add(store.Id);
+                i++;
             }
             return result;
+        }
+
+        static int SelectStoreFront(SQLDatastore datastore)
+        {
+            List<int> choices = SearchStoreFront(datastore);
+            while (true)
+            {
+                switch (choices.Count)
+                {
+                    case 0:
+                        return -1;
+                    case 1:
+                        Console.WriteLine("Selecting your matching store.");
+                        return choices[0];
+                    default:
+                        Console.WriteLine("Select a Store by the number on the left of the listing, or 0 to return.");
+                        int selection;
+                        bool result = int.TryParse(Console.ReadLine(), out selection);
+                        if (result) {
+                            if (selection == 0)
+                                return -1;
+                            if (selection < 1 || selection > choices.Count)
+                                Console.WriteLine("Invalid entry, please try again.");
+                            else
+                                return choices[selection-1];
+                        } else
+                            Console.WriteLine("Invalid entry, please try again.");
+                        break;
+                }
+            }
+            throw new InvalidProgramException("Program flow error: SelectStoreFront");
         }
 
         static MenuState MainMenu(SQLDatastore datastore)
@@ -61,6 +93,7 @@ namespace P0UI
                 Console.WriteLine("1. Add Customer");
                 Console.WriteLine("2. Search Customer");
                 Console.WriteLine("3. Search Store Fronts");
+                Console.WriteLine("4. List Store Inventory");
                 switch(Console.ReadLine())
                 {
                     case "0":
@@ -81,6 +114,17 @@ namespace P0UI
                         break;
                     case "3":
                         SearchStoreFront(datastore);
+                        break;
+                    case "4":
+                        int selection = SelectStoreFront(datastore);
+                        if (selection != -1) {
+                            p0class.StoreFront store = datastore.LoadStoreFrontById(selection);
+                            Console.WriteLine("Quantity,Name,Price,Description");
+                            foreach(p0class.LineItem item in store.Inventory)
+                            {
+                                Console.WriteLine($"{item.Quantity},{item.Prod.Name},{item.Prod.Price},{item.Prod.Description}");
+                            }
+                        }
                         break;
                     default:
                         Console.WriteLine("Invalid Entry, try again.");
