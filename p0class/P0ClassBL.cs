@@ -4,6 +4,7 @@ namespace p0class
 {
     public class Customer
     {
+        public int Id {set; get;}
         public string Name {set; get;}
 
         public string Address {set; get;}
@@ -20,6 +21,7 @@ namespace p0class
 
     public class Product
     {
+        public int Id {set; get;}
         public string Name {set; get;}
 
         public decimal Price {set; get;}
@@ -38,7 +40,7 @@ namespace p0class
 
     public class StoreFront
     {
-        public int id {set; get;}
+        public int Id {set; get;}
         public string Name {set; get;}
 
         public string Address {set; get;}
@@ -56,6 +58,7 @@ namespace p0class
 
     public class Order
     {
+        public int Id {set; get;}
         public List<LineItem> LineItems {set; get;}
 
         public string Location {set; get;}
