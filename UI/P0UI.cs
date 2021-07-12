@@ -14,7 +14,8 @@ namespace P0UI
         public enum ChoosingChoice
         {
             Customer,
-            StoreFront
+            StoreFront,
+            DefaultState
         }
         static List<int> SearchCustomer(SQLDatastore datastore)
         {
@@ -203,12 +204,48 @@ namespace P0UI
 
         static void ShowOrder(p0class.Order p_order)
         {
-            Console.WriteLine("Item, Quantity, Price");
+            Console.WriteLine("Item,Quantity,Item Price,Line Price");
             foreach (p0class.LineItem item in p_order.LineItems)
             {
-                Console.WriteLine($"{item.Prod.Name}, {item.Quantity}, {item.Quantity * item.Prod.Price}");
+                Console.WriteLine($"{item.Prod.Name},{item.Quantity},{item.Prod.Price},{item.Quantity * item.Prod.Price}");
             }
             Console.WriteLine($"Total Price: {p_order.TotalPrice}");
+        }
+
+        static void OrderHistoryUI(SQLDatastore datastore)
+        {
+            bool repeat = true;
+
+            Console.WriteLine("Order History:");
+            Console.WriteLine("1. By Customer");
+            Console.WriteLine("2. By Store Front");
+            ChoosingChoice inquiryType = ChoosingChoice.DefaultState;
+            while (repeat)
+            {
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        inquiryType = ChoosingChoice.Customer;
+                        repeat = false;
+                        break;
+                    case "2":
+                        inquiryType = ChoosingChoice.StoreFront;
+                        repeat = false;
+                        break;
+                    default:
+                        Console.Write("Invalid entry, try again.");
+                        break;                        
+                }
+            }
+            int userChoice = SelectChoice(datastore, inquiryType);
+            if (inquiryType == ChoosingChoice.DefaultState)
+                throw new InvalidProgramException("Program flow error: OrderHistoryUI");
+            List<p0class.Order> orderHistory = datastore.LoadOrderHistory(userChoice, (inquiryType == ChoosingChoice.Customer));
+
+            foreach (p0class.Order order in orderHistory)
+            {
+                ShowOrder(order);
+            }                  
         }
 
         static void MainMenu(SQLDatastore datastore)
@@ -224,6 +261,7 @@ namespace P0UI
                 Console.WriteLine("3. Search Store Fronts");
                 Console.WriteLine("4. List Store Inventory");
                 Console.WriteLine("5. Place Order");
+                Console.WriteLine("6. View Order History");
                 switch(Console.ReadLine())
                 {
                     case "0":
@@ -242,8 +280,11 @@ namespace P0UI
                         StoreFrontInventoryUI(datastore);
                         break;
                     case "5":
+                        CreateOrderUI(datastore);
                         break;
-
+                    case "6":
+                        OrderHistoryUI(datastore);
+                        break;
                     default:
                         Console.WriteLine("Invalid Entry, try again.");
                         break;

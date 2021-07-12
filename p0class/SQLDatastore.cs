@@ -167,6 +167,31 @@ namespace p0class
             return result;
         }
 
+        public List<p0class.Order> LoadOrderHistory(int p_id, bool p_cust)
+        {
+            List<p0class.Order> result = _context.Orders.Select(
+                order =>
+                    new Order
+                    {
+                        Id = order.OId,
+                        Location = order.OLoc,
+                        CustomerId = (int)order.OCust,
+                        StoreFrontId = order.OStore
+                    }
+            ).Where(x => p_id == (p_cust ? x.CustomerId : x.StoreFrontId)).ToList();
+
+            foreach(Order order in result)
+            {
+                order.LineItems = LoadLineItemsById(order.Id, true);
+                foreach(LineItem line in order.LineItems)
+                {
+                    order.TotalPrice += line.Prod.Price * line.Quantity;
+                }
+            }
+
+            return result;
+        }
+    
         public bool SaveOrder(p0class.Order p_order, List<p0class.LineItem> p_modified)
         {
             _context.Database.BeginTransaction();
