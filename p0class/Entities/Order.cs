@@ -14,7 +14,6 @@ namespace p0class.Entities
 
         public int OId { get; set; }
         public string OLoc { get; set; }
-        public decimal OPrice { get; set; }
         public int OStore { get; set; }
         public int? OCust { get; set; }
 

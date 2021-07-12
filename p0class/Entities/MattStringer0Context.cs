@@ -103,10 +103,6 @@ namespace p0class.Entities
                     .IsUnicode(false)
                     .HasColumnName("o_loc");
 
-                entity.Property(e => e.OPrice)
-                    .HasColumnType("decimal(20, 2)")
-                    .HasColumnName("o_price");
-
                 entity.Property(e => e.OStore).HasColumnName("o_store");
 
                 entity.HasOne(d => d.OCustNavigation)
