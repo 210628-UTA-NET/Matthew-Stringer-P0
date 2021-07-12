@@ -11,18 +11,6 @@ namespace P0UI
 {
     class Program
     {
-        public enum MenuState
-        {
-            MainMenu,
-            StoreFrontMenu,
-            ViewInventory,
-            PlaceOrder,
-            OrderHistory,
-            Replenish,
-            Exit
-
-        }
-
         public enum ChoosingChoice
         {
             Customer,
@@ -102,6 +90,18 @@ namespace P0UI
             throw new InvalidProgramException("Program flow error: SelectChoice");
         }
 
+        static void AddCustomerUI(SQLDatastore datastore)
+        {
+            p0class.Customer customer = new p0class.Customer();
+            Console.WriteLine("Name?");
+            customer.Name = Console.ReadLine();
+            Console.WriteLine("Address?");
+            customer.Address = Console.ReadLine();
+            Console.WriteLine("Email?");
+            customer.Email = Console.ReadLine();
+            datastore.AddCustomer(customer);
+        }
+
         static void ListLineItems(List<p0class.LineItem> p_items)
         {
             Console.WriteLine("#,Quantity,Name,Price,Description");
@@ -125,6 +125,82 @@ namespace P0UI
             return result;
         }
 
+        static void StoreFrontInventoryUI(SQLDatastore datastore)
+        {
+            int userChoice = SelectChoice(datastore, ChoosingChoice.StoreFront);
+
+            if (userChoice != -1)
+                ListLineItems(datastore.LoadStoreFrontById(userChoice).Inventory);
+        }
+
+        static void CreateOrderUI(SQLDatastore datastore)
+        {
+            int selectStore;
+            do
+                selectStore = SelectChoice(datastore, ChoosingChoice.StoreFront);
+            while(selectStore == -1);
+            int selectCustomer;
+            do
+                selectCustomer = SelectChoice(datastore, ChoosingChoice.Customer);
+            while(selectCustomer == -1);
+            p0class.StoreFront store = datastore.LoadStoreFrontById(selectStore);
+            ListLineItems(store.Inventory);
+            List<p0class.LineItem> modifiedItems = new List<p0class.LineItem>();
+            p0class.Order newOrder = new p0class.Order();
+            newOrder.StoreFrontId = selectStore;
+            newOrder.CustomerId = selectCustomer;
+            newOrder.Location = ChooseNonemptyString("Enter the address for delivery.");
+            bool repeat = true;
+            while (repeat)
+            {
+                Console.WriteLine("Item number? 0 to finish");
+                int selectedInventory;
+                bool result = int.TryParse(Console.ReadLine(), out selectedInventory);
+                if (result) {
+                    if (selectedInventory == 0)
+                        repeat = false;
+                    else if (selectedInventory >= 1 && selectedInventory <= store.Inventory.Count)
+                    {
+                        p0class.LineItem selectedProductInventory = store.Inventory[selectedInventory-1];
+                        p0class.LineItem existingOrder = newOrder.LineItems.Where(x => x.Prod.Id == selectedProductInventory.Id).SingleOrDefault();
+                        if (existingOrder != null)
+                        {
+                            // To do: Make it possible to modify an order
+                            Console.WriteLine("You've already ordered this item.");
+                        } else {
+                            Console.WriteLine("Quantity?");
+                            int quantitySelection;
+                            result = int.TryParse(Console.ReadLine(), out quantitySelection);
+                            if (result)
+                            {
+                                if (quantitySelection < 1 || quantitySelection > selectedProductInventory.Quantity)
+                                    Console.WriteLine("Invalid entry. Try again.");
+                                else
+                                {
+                                    newOrder.LineItems.Add(new p0class.LineItem
+                                        {
+                                            Quantity = quantitySelection,
+                                            Prod = selectedProductInventory.Prod
+                                        }
+                                    );
+                                    selectedProductInventory.Quantity -= quantitySelection;
+                                    modifiedItems.Add(selectedProductInventory);
+                                    newOrder.TotalPrice += quantitySelection * selectedProductInventory.Prod.Price;
+                                }
+                            }
+                        }
+                    }
+                    else
+                        Console.WriteLine("Invalid entry, please try again."); 
+                }
+            }
+            if (newOrder.LineItems.Count > 0)
+            {
+                ShowOrder(newOrder);
+                datastore.SaveOrder(newOrder, modifiedItems);
+            }
+        }
+
         static void ShowOrder(p0class.Order p_order)
         {
             Console.WriteLine("Item, Quantity, Price");
@@ -135,7 +211,7 @@ namespace P0UI
             Console.WriteLine($"Total Price: {p_order.TotalPrice}");
         }
 
-        static MenuState MainMenu(SQLDatastore datastore)
+        static void MainMenu(SQLDatastore datastore)
         {
             bool looping = true;
 
@@ -154,14 +230,7 @@ namespace P0UI
                         looping = false;
                         break;
                     case "1":
-                        p0class.Customer customer = new p0class.Customer();
-                        Console.WriteLine("Name?");
-                        customer.Name = Console.ReadLine();
-                        Console.WriteLine("Address?");
-                        customer.Address = Console.ReadLine();
-                        Console.WriteLine("Email?");
-                        customer.Email = Console.ReadLine();
-                        datastore.AddCustomer(customer);
+                        AddCustomerUI(datastore);
                         break;
                     case "2":
                         SearchCustomer(datastore);
@@ -170,103 +239,14 @@ namespace P0UI
                         SearchStoreFront(datastore);
                         break;
                     case "4":
-                        {
-                            int userChoice = SelectChoice(datastore, ChoosingChoice.StoreFront);
-
-                            if (userChoice != -1)
-                                ListLineItems(datastore.LoadStoreFrontById(userChoice).Inventory);
-                        }
+                        StoreFrontInventoryUI(datastore);
                         break;
                     case "5":
-                        int selectStore;
-                        do
-                            selectStore = SelectChoice(datastore, ChoosingChoice.StoreFront);
-                        while(selectStore == -1);
-                        int selectCustomer;
-                        do
-                            selectCustomer = SelectChoice(datastore, ChoosingChoice.Customer);
-                        while(selectCustomer == -1);
-                        p0class.StoreFront store = datastore.LoadStoreFrontById(selectStore);
-                        ListLineItems(store.Inventory);
-                        List<p0class.LineItem> modifiedItems = new List<p0class.LineItem>();
-                        p0class.Order newOrder = new p0class.Order();
-                        newOrder.StoreFrontId = selectStore;
-                        newOrder.CustomerId = selectCustomer;
-                        newOrder.Location = ChooseNonemptyString("Enter the address for delivery.");
-                        bool repeat = true;
-                        while (repeat)
-                        {
-                            Console.WriteLine("Item number? 0 to finish");
-                            int selectedInventory;
-                            bool result = int.TryParse(Console.ReadLine(), out selectedInventory);
-                            if (result) {
-                                if (selectedInventory == 0)
-                                    repeat = false;
-                                else if (selectedInventory >= 1 && selectedInventory <= store.Inventory.Count)
-                                {
-                                    p0class.LineItem selectedProductInventory = store.Inventory[selectedInventory-1];
-                                    p0class.LineItem existingOrder = newOrder.LineItems.Where(x => x.Prod.Id == selectedProductInventory.Id).SingleOrDefault();
-                                    if (existingOrder != null)
-                                    {
-                                        // To do: Make it possible to modify an order
-                                        Console.WriteLine("You've already ordered this item.");
-                                    } else {
-                                        Console.WriteLine("Quantity?");
-                                        int quantitySelection;
-                                        result = int.TryParse(Console.ReadLine(), out quantitySelection);
-                                        if (result)
-                                        {
-                                            if (quantitySelection < 1 || quantitySelection > selectedProductInventory.Quantity)
-                                                Console.WriteLine("Invalid entry. Try again.");
-                                            else
-                                            {
-                                                newOrder.LineItems.Add(new p0class.LineItem
-                                                    {
-                                                        Quantity = quantitySelection,
-                                                        Prod = selectedProductInventory.Prod
-                                                    }
-                                                );
-                                                selectedProductInventory.Quantity -= quantitySelection;
-                                                modifiedItems.Add(selectedProductInventory);
-                                                newOrder.TotalPrice += quantitySelection * selectedProductInventory.Prod.Price;
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                    Console.WriteLine("Invalid entry, please try again."); 
-                            }
-                        }
-                        if (newOrder.LineItems.Count > 0)
-                        {
-                            ShowOrder(newOrder);
-                            datastore.SaveOrder(newOrder, modifiedItems);
-                        }
                         break;
 
                     default:
                         Console.WriteLine("Invalid Entry, try again.");
                         break;
-                }
-            }
-            return MenuState.Exit;
-        }
-
-        static void MenuStateMachine(SQLDatastore datastore)
-        {
-            MenuState state = MenuState.MainMenu;
-
-            while (state != MenuState.Exit)
-            {
-                switch(state)
-                {
-                    case MenuState.MainMenu:
-                        state = MainMenu(datastore);
-                        break;
-                    case MenuState.Exit:
-                        return;
-                    default:
-                        throw new InvalidProgramException("Invalid Menu State");
                 }
             }
         }
@@ -287,7 +267,7 @@ namespace P0UI
                 .Options;
 
             SQLDatastore repo = new SQLDatastore(new MattStringer0Context(options));
-            MenuStateMachine(repo);
+            MainMenu(repo);
         }
     }
 }
