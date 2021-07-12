@@ -105,6 +105,7 @@ namespace p0class
                 prod => prod.PId,
                 (item, prod) => new
                 {
+                    LId = item.LId,
                     Quantity = item.LQuantity,
                     Order = item.LOrder,
                     StoreFront = item.LStorefront,
@@ -120,7 +121,7 @@ namespace p0class
             foreach (var datum in data)
             {
                 LineItem newLine = new LineItem {
-                    Id = datum.PId,
+                    Id = datum.LId,
                     Quantity = datum.Quantity,
                     Prod = new Product{
                         Id = datum.PId,
@@ -164,6 +165,43 @@ namespace p0class
 
             result.Inventory = LoadLineItemsById(result.Id, false);
             return result;
+        }
+
+        public bool SaveOrder(p0class.Order p_order, List<p0class.LineItem> p_modified)
+        {
+            _context.Database.BeginTransaction();
+            Entities.Order newRow = new Entities.Order
+                {
+                    OLoc = p_order.Location,
+                    OCust = p_order.CustomerId,
+                    OStore = p_order.StoreFrontId
+                };
+            _context.Add(newRow);
+            _context.SaveChanges();
+            foreach (p0class.LineItem item in p_order.LineItems)
+            {
+                _context.Add(new Entities.LineItem
+                    {
+                        LOrder = newRow.OId,
+                        LProd = item.Prod.Id,
+                        LQuantity = item.Quantity
+                    });
+            }
+            foreach (p0class.LineItem item in p_modified)
+            {
+                if (item.Quantity == 0)
+                {
+                    _context.Remove(_context.LineItems.Single(x => x.LId == item.Id));
+                }
+                else
+                {
+                    Entities.LineItem updateRow = _context.Find<Entities.LineItem>(item.Id);
+                    updateRow.LQuantity = item.Quantity;
+                }
+            }
+            _context.SaveChanges();
+            _context.Database.CommitTransaction();
+            return true;
         }
     }
 }

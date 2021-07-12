@@ -73,6 +73,7 @@ namespace p0class
         public Order()
         {
             this.LineItems = new List<LineItem>();
+            this.TotalPrice = 0;
         }
     }
 }
