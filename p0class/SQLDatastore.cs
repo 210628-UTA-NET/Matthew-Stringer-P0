@@ -120,6 +120,7 @@ namespace p0class
             foreach (var datum in data)
             {
                 LineItem newLine = new LineItem {
+                    Id = datum.PId,
                     Quantity = datum.Quantity,
                     Prod = new Product{
                         Id = datum.PId,

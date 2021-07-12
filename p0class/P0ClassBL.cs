@@ -33,6 +33,7 @@ namespace p0class
 
     public class LineItem
     {
+        public int Id {set; get;}
         public Product Prod {set; get;}
 
         public int Quantity {set; get;}
