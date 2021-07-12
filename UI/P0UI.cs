@@ -15,6 +15,7 @@ namespace P0UI
         {
             Customer,
             StoreFront,
+            Product,
             DefaultState
         }
         static List<int> SearchCustomer(SQLDatastore datastore)
@@ -237,15 +238,100 @@ namespace P0UI
                         break;                        
                 }
             }
-            int userChoice = SelectChoice(datastore, inquiryType);
             if (inquiryType == ChoosingChoice.DefaultState)
                 throw new InvalidProgramException("Program flow error: OrderHistoryUI");
+            int userChoice = SelectChoice(datastore, inquiryType);
             List<p0class.Order> orderHistory = datastore.LoadOrderHistory(userChoice, (inquiryType == ChoosingChoice.Customer));
 
             foreach (p0class.Order order in orderHistory)
             {
                 ShowOrder(order);
             }                  
+        }
+
+        static void ListProducts(List<p0class.Product> p_prodList)
+        {
+            Console.WriteLine("#,Name,Price,Description,Category");
+            int i = 1;
+            foreach (p0class.Product prod in p_prodList)
+            {
+                Console.WriteLine($"{i},{prod.Name},{prod.Price},{prod.Description},{prod.Category}");
+                i += 1;
+            }
+        }
+
+       static void SelectProduct(SQLDatastore datastore, p0class.StoreFront store, List<p0class.Product> prodList)
+        {
+            bool repeat = true;
+
+            while (repeat)
+            {
+                Console.WriteLine("Enter product number.");
+                int selection;
+                if (int.TryParse(Console.ReadLine(), out selection) &&
+                    selection >= 1 && selection <= prodList.Count)
+                {
+                    Console.WriteLine("Select quantity.");
+                    int quantity;
+                    if (int.TryParse(Console.ReadLine(), out quantity) && quantity >= 1)
+                    {
+                        datastore.UpdateOrAddInventory(store.Id, prodList[selection-1].Id, quantity);
+                        store.Inventory = datastore.LoadLineItemsById(store.Id, false);
+                        repeat = false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid Entry, try again.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Entry, try again.");
+                }
+            }
+        }
+
+        static void ReplenishInventoryUI(SQLDatastore datastore)
+        {
+            int userChoice;
+            do
+            {
+                userChoice = SelectChoice(datastore, ChoosingChoice.StoreFront);
+            } while (userChoice == -1);
+
+            p0class.StoreFront store = datastore.LoadStoreFrontById(userChoice);
+            List<p0class.Product> prodList = datastore.GetAllProducts();
+            bool repeat = true;
+            while(repeat)
+            {
+                Console.WriteLine("0. Done");
+                Console.WriteLine("1. List Current Inventory");
+                Console.WriteLine("2. List Products");
+                Console.WriteLine("3. Select Product");
+                switch (Console.ReadLine())
+                {
+                    case "0":
+                        repeat = false;
+                        break;
+
+                    case "1":
+                        ListLineItems(store.Inventory);
+                        break;
+
+                    case "2":
+                        ListProducts(prodList);
+                        break;
+
+                    case "3":
+                        SelectProduct(datastore, store, prodList);
+                        break;
+
+                    default:
+                        Console.WriteLine("Invalid Entry, try again.");
+                        break;
+                }
+            }
+            
         }
 
         static void MainMenu(SQLDatastore datastore)
@@ -262,6 +348,7 @@ namespace P0UI
                 Console.WriteLine("4. List Store Inventory");
                 Console.WriteLine("5. Place Order");
                 Console.WriteLine("6. View Order History");
+                Console.WriteLine("7. Replenish Inventory");
                 switch(Console.ReadLine())
                 {
                     case "0":
@@ -284,6 +371,9 @@ namespace P0UI
                         break;
                     case "6":
                         OrderHistoryUI(datastore);
+                        break;
+                    case "7":
+                        ReplenishInventoryUI(datastore);
                         break;
                     default:
                         Console.WriteLine("Invalid Entry, try again.");

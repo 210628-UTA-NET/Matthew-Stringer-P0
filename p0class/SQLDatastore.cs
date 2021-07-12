@@ -97,7 +97,7 @@ namespace p0class
             return resultList;
         }
 
-        private List<LineItem> LoadLineItemsById(int p_id, bool p_order)
+        public List<LineItem> LoadLineItemsById(int p_id, bool p_order)
         {
             var data = _context.LineItems.Join(
                 _context.Products,
@@ -226,6 +226,48 @@ namespace p0class
             }
             _context.SaveChanges();
             _context.Database.CommitTransaction();
+            return true;
+        }
+
+        public List<Product> GetAllProducts()
+        {
+            List<Product> result = new List<Product>();
+             
+            foreach (var prod in _context.Products.ToList<Entities.Product>())
+            {
+                result.Add(new Product
+                    {
+                        Id = prod.PId,
+                        Name = prod.PName,
+                        Price = prod.PPrice,
+                        Description = prod.PDesc,
+                        Category = prod.PCategory
+                    });
+            }
+            return result;
+        }
+
+        public bool UpdateOrAddInventory(int p_store, int p_prod, int p_quantity)
+        {
+            Entities.LineItem item = _context.LineItems.Select(l => l)
+                .Where(l => l.LStorefront == p_store && l.LProd == p_prod).SingleOrDefault();
+
+            if (item == null)
+            {
+                _context.LineItems.Add(new Entities.LineItem
+                    {
+                        LStorefront = p_store,
+                        LProd = p_prod,
+                        LQuantity = p_quantity
+                    });
+            }
+            else
+            {
+                item.LQuantity += p_quantity;
+            }
+
+            _context.SaveChanges();
+
             return true;
         }
     }
