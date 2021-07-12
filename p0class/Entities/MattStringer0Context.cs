@@ -23,7 +23,7 @@ namespace p0class.Entities
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<StoreFront> StoreFronts { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
@@ -58,6 +58,9 @@ namespace p0class.Entities
                     .HasName("pk_line_items");
 
                 entity.ToTable("line_items");
+
+                entity.HasIndex(e => new { e.LProd, e.LOrder, e.LStorefront }, "uq_line_items_prod_order_storefront")
+                    .IsUnique();
 
                 entity.Property(e => e.LId).HasColumnName("l_id");
 
