@@ -20,27 +20,32 @@ namespace P0UI
         }
         static List<int> SearchCustomer(SQLDatastore datastore)
         {
-            Console.WriteLine("Enter Customer Name:");
+            Console.WriteLine("Enter Customer Name or Part of Name:");
 
             List<int> result = new List<int>();
-
-            foreach (SQLDatastore.CustomerSearchResult cust in datastore.SearchCustomerByName(Console.ReadLine()))
+            int i = 1;
+            string search = Console.ReadLine();
+            Console.WriteLine("#,Name,Address,Email");
+            foreach (SQLDatastore.CustomerSearchResult cust in datastore.SearchCustomerByName(search))
             {
-                Console.WriteLine($"{cust.Name}, {cust.Address}, {cust.Email}");
+                Console.WriteLine($"{i},{cust.Name},{cust.Address},{cust.Email}");
                 result.Add(cust.Id);
+                i += 1;
             }
             return result;
         }
 
         static List<int> SearchStoreFront(SQLDatastore datastore)
         {
-            Console.WriteLine("Enter Store Name:");
+            Console.WriteLine("Enter Store Name or Part Of Name:");
 
             List<int> result = new List<int>();
             int i = 1;
-            foreach (SQLDatastore.StoreSearchResult store in datastore.SearchStoreFrontByName(Console.ReadLine()))
+            string search = Console.ReadLine();
+            Console.WriteLine("#,Name,Address");
+            foreach (SQLDatastore.StoreSearchResult store in datastore.SearchStoreFrontByName(search))
             {
-                Console.WriteLine($"{i}: {store.Name}, {store.Address}");
+                Console.WriteLine($"{i},{store.Name},{store.Address}");
                 result.Add(store.Id);
                 i++;
             }

@@ -46,7 +46,7 @@ namespace p0class
                         Address = cust.CAddr,
                         Email = cust.CEmail
                     }
-            ).Where(x => x.Name == p_name).ToList();
+            ).Where(x => x.Name.Contains(p_name)).ToList();
 
             List<CustomerSearchResult> result = new List<CustomerSearchResult>();
             foreach(Customer datum in data)
@@ -83,7 +83,7 @@ namespace p0class
                         Name = store.SName,
                         Address = store.SAddr
                     }
-            ).Where(x => x.Name == p_name).ToList();
+            ).Where(x => x.Name.Contains(p_name)).ToList();
             List<StoreSearchResult> resultList = new List<StoreSearchResult>();
             foreach (StoreFront datum in data)
             {
