@@ -142,14 +142,12 @@ namespace P0UI
 
         static void CreateOrderUI(SQLDatastore datastore)
         {
-            int selectStore;
-            do
-                selectStore = SelectChoice(datastore, ChoosingChoice.StoreFront);
-            while(selectStore == -1);
-            int selectCustomer;
-            do
-                selectCustomer = SelectChoice(datastore, ChoosingChoice.Customer);
-            while(selectCustomer == -1);
+            int selectStore = SelectChoice(datastore, ChoosingChoice.StoreFront);
+            if (selectStore == -1)
+                return;
+            int selectCustomer = SelectChoice(datastore, ChoosingChoice.Customer);
+            if (selectCustomer == -1)
+                return;
             p0class.StoreFront store = datastore.LoadStoreFrontById(selectStore);
             ListLineItems(store.Inventory);
             List<p0class.LineItem> modifiedItems = new List<p0class.LineItem>();
@@ -298,11 +296,9 @@ namespace P0UI
 
         static void ReplenishInventoryUI(SQLDatastore datastore)
         {
-            int userChoice;
-            do
-            {
-                userChoice = SelectChoice(datastore, ChoosingChoice.StoreFront);
-            } while (userChoice == -1);
+            int userChoice = SelectChoice(datastore, ChoosingChoice.StoreFront);
+            if (userChoice == -1)
+                return;
 
             p0class.StoreFront store = datastore.LoadStoreFrontById(userChoice);
             List<p0class.Product> prodList = datastore.GetAllProducts();
